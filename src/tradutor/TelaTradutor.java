@@ -30,7 +30,7 @@ public class TelaTradutor {
 	private JButton button_3;
 	private JLabel label_5;
 	private JLabel label_6;
-	private JComboBox comboBox;
+	private JComboBox<String> comboBox;
 	private JTextArea textArea;
 
 	/**
@@ -92,6 +92,7 @@ public class TelaTradutor {
 		frame.getContentPane().add(button);
 		button.setEnabled(false);
 
+		// Configura os ícones das bandeiras e seta
 		ImageIcon iconBR = new ImageIcon(Tradutor.class.getResource("/Imagens/brasil.png"));
 		ImageIcon iconEUA = new ImageIcon(Tradutor.class.getResource("/Imagens/EUA.png"));
 		ImageIcon iconSeta = new ImageIcon(Tradutor.class.getResource("/Imagens/seta-direita.png"));
@@ -120,7 +121,7 @@ public class TelaTradutor {
 		label_6.setBounds(8, 217, 155, 15);
 		frame.getContentPane().add(label_6);
 		
-		comboBox = new JComboBox();
+		comboBox = new JComboBox<String>();
 		comboBox.setBounds(165, 84, 104, 23);
 		frame.getContentPane().add(comboBox);
 
@@ -137,6 +138,7 @@ public class TelaTradutor {
 
 		frame.getContentPane().add(scroll);
 		
+		// Habilita/desabilita o botão de tradução baseado no conteúdo do campo de texto
 		textField.addKeyListener(new KeyAdapter() {
 		    public void keyReleased(KeyEvent e) {
 		        if (textField.getText().trim().isEmpty()) {
@@ -147,6 +149,7 @@ public class TelaTradutor {
 		    }
 		});
 		
+		// Alterna as bandeiras quando a direção da tradução é alterada
 		comboBox.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e) {
 		       String selecionado = (String) comboBox.getSelectedItem(); 
@@ -161,15 +164,15 @@ public class TelaTradutor {
 		   	}
 		});
 
-		
+		// Botão de tradução
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Tradutor tradutor = new Tradutor();
-				String [] partes = textField.getText().trim().split(" ");
+				String [] partes = textField.getText().trim().split(" "); 
 				ArrayList<String> tradução = new ArrayList<>();
-				String sf = "";
-				Boolean sfB = false;
-				Boolean sfBB = false;
+				String resultadoTraducao = ""; 
+				Boolean temUmaTraducao = false; 
+				Boolean temMultiplaTraducao = false; 
 				String direcao = (String) comboBox.getSelectedItem();
 				boolean isBrParaEua = direcao.equals("BR  -> EUA");
 				
@@ -181,37 +184,38 @@ public class TelaTradutor {
 						resultado = tradutor.toPortugues(s);
 					}
 					if (!resultado.isEmpty()) {
+						// Processa palavras com múltiplas traduções
 						if (resultado.size() >= 2){
-							sfBB = true;
+							temMultiplaTraducao = true;
 							for (int i = 0; i < resultado.size(); i++) {
 								if (i == 0) {
-									if (!sfB) {
-										sf = resultado.get(i);
+									if (!temUmaTraducao) {
+										resultadoTraducao = resultado.get(i);
 									} else {
-										sf = sf + "/" + resultado.get(i);
+										resultadoTraducao = resultadoTraducao + "/" + resultado.get(i);
 									}
 								}
 								else {
-									sf = sf + "/" + resultado.get(i);
+									resultadoTraducao = resultadoTraducao + "/" + resultado.get(i);
 								}
 							}
 						} else {
-							if (!sfBB && !sfB) {
-								sf = resultado.get(0);
-								sfB = true;
+							if (!temMultiplaTraducao && !temUmaTraducao) {
+								resultadoTraducao = resultado.get(0);
+								temUmaTraducao = true;
 							} else {
-								sf = sf + "/" + resultado.get(0);
-								sfB = true;
+								resultadoTraducao = resultadoTraducao + "/" + resultado.get(0);
+								temUmaTraducao = true;
 							}
 						}
 					}
 				}
 				
-				if (!sf.isEmpty()) {
-					String[] pt2 = sf.split("/");
+				if (!resultadoTraducao.isEmpty()) {
+					String[] pt2 = resultadoTraducao.split("/");
 
-					if (sfB) { 
-						ArrayList<String> usadas = new ArrayList<>();
+					if (temUmaTraducao) { 
+						ArrayList<String> usadas = new ArrayList<>(); 
 						for (int i = 0; i < pt2.length; i++) {
 							if (!(i % 2 == 0)) { 
 								if (usadas.contains(pt2[i - 1])) { 
@@ -222,7 +226,7 @@ public class TelaTradutor {
 							}
 						}
 
-					} else if (sfBB) { 
+					} else if (temMultiplaTraducao) { 
 						for (int i = 0; i < pt2.length; i++) {
 							if (!(i % 2 == 0)) {
 								tradução.add(pt2[i] + "\n"); 
@@ -230,7 +234,7 @@ public class TelaTradutor {
 						}
 					}
 
-						if ((!sfB && sfBB) || (sfB && tradução.size() == 1)) {
+						if ((!temUmaTraducao && temMultiplaTraducao) || (temUmaTraducao && tradução.size() == 1)) {
 							int n = tradução.size();
 							tradução.add(0, "Resultados da pesquisa: " + n + "\n");
 							textArea.setText(String.join("", tradução));
@@ -245,6 +249,7 @@ public class TelaTradutor {
 			}
 		});
 		
+		// Botão para listar todas as palavras em português
 		button_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Tradutor tradutor = new Tradutor ();
@@ -255,6 +260,7 @@ public class TelaTradutor {
 			}
 		});
 		
+		// Botão para listar todas as palavras em inglês
 		button_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Tradutor tradutor = new Tradutor ();
