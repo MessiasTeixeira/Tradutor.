@@ -164,158 +164,83 @@ public class TelaTradutor {
 		
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (label.getIcon() == iconBR) {
-		            Tradutor tradutor = new Tradutor();
-		            String [] partes = textField.getText().trim().split(" ");
-		            ArrayList<String> tradução = new ArrayList<>();
-		            String sf = "";
-					Boolean sfB = false;
-					Boolean sfBB = false;
-		            
-		            
-		            for (String s : partes) {
-		            	ArrayList<String> resultado = tradutor.toIngles(s);
-						System.out.println("Partes 0: " + partes[0]);
-						System.out.println("Partes LENGTH: " + partes.length);
-						System.out.println("Resultado: " + resultado);
-		            	if (!resultado.isEmpty()) {
-		            		if (resultado.size() >= 2){
-								sfBB = true;
-		            			for (int i = 0; i < resultado.size(); i++) {
-		            				if (i == 0) {
-										if (!sfB) {
-		            						sf = resultado.get(i);
-										} else {
-											sf = sf + "/" + resultado.get(i);
-										}
-		            				}
-		            				else {
-		            					sf = sf + "/" + resultado.get(i);
-										System.out.println("SF: " + sf);
-		            				}
-		            			}
-		            		} else {
-								if (!sfBB && !sfB) {
-									sf = resultado.get(0);
-								    sfB = true;
-								} else {
-									sf = sf + "/" + resultado.get(0);
-									sfB = true;
-								}
-		            		}
-		            	}
+				Tradutor tradutor = new Tradutor();
+				String [] partes = textField.getText().trim().split(" ");
+				ArrayList<String> tradução = new ArrayList<>();
+				String sf = "";
+				Boolean sfB = false;
+				Boolean sfBB = false;
+				String direcao = (String) comboBox.getSelectedItem();
+				boolean isBrParaEua = direcao.equals("BR  -> EUA");
+				
+				for (String s : partes) {
+					ArrayList<String> resultado;
+					if (isBrParaEua) {
+						resultado = tradutor.toIngles(s);
+					} else {
+						resultado = tradutor.toPortugues(s);
 					}
-		            
-		            if (!sf.isEmpty()) {
-						if (sfB) {
-							ArrayList<String> usadas = new ArrayList<>();					
-							String [] pt2 = sf.split("/");
-							for (int i = 0; i < pt2.length; i++) {
-								if (!(i % 2 == 0)) {
-									if (usadas.contains(pt2[i-1])) {
-										continue;
-									}
-									usadas.add(pt2[i-1]);
-									tradução.add(pt2[i] + " ");
+					if (!resultado.isEmpty()) {
+						if (resultado.size() >= 2){
+							sfBB = true;
+							for (int i = 0; i < resultado.size(); i++) {
+								if (i == 0) {
+									if (!sfB) {
+										sf = resultado.get(i);
+									} else {
+										sf = sf + "/" + resultado.get(i);
 									}
 								}
-						} 
-						if (tradução.size() == 1 || !sfB && sfBB){
-							String [] pt2 = sf.split("/");
-							int n = 0;
-							for (int i = 0; i < pt2.length; i++) {
-								if (!(i % 2 == 0)) {
-									n += 1;
-									tradução.add(pt2[i] + "\n");
+								else {
+									sf = sf + "/" + resultado.get(i);
 								}
 							}
+						} else {
+							if (!sfBB && !sfB) {
+								sf = resultado.get(0);
+								sfB = true;
+							} else {
+								sf = sf + "/" + resultado.get(0);
+								sfB = true;
+							}
+						}
+					}
+				}
+				
+				if (!sf.isEmpty()) {
+					String[] pt2 = sf.split("/");
+
+					if (sfB) { 
+						ArrayList<String> usadas = new ArrayList<>();
+						for (int i = 0; i < pt2.length; i++) {
+							if (!(i % 2 == 0)) { 
+								if (usadas.contains(pt2[i - 1])) { 
+									continue;
+								}
+								usadas.add(pt2[i - 1]);
+								tradução.add(pt2[i] + " ");
+							}
+						}
+
+					} else if (sfBB) { 
+						for (int i = 0; i < pt2.length; i++) {
+							if (!(i % 2 == 0)) {
+								tradução.add(pt2[i] + "\n"); 
+							}
+						}
+					}
+
+						if ((!sfB && sfBB) || (sfB && tradução.size() == 1)) {
+							int n = tradução.size();
 							tradução.add(0, "Resultados da pesquisa: " + n + "\n");
 							textArea.setText(String.join("", tradução));
-							} else {
-								tradução.add(0, "Tradução da frase: " + "\n");
-								textArea.setText(String.join("", tradução));
-							}
-		            } else {
-		            	textArea.setText("Palavra inválida");
-		            }
-
+						} else {
+							tradução.add(0, "Tradução da frase: " + "\n");
+							textArea.setText(String.join("", tradução));
+						}
 
 				} else {
-		            Tradutor tradutor = new Tradutor();
-		            String [] partes = textField.getText().trim().split(" ");
-		            ArrayList<String> tradução = new ArrayList<>();
-	            	String sf = "";
-					Boolean sfB = false;
-					Boolean sfBB = false;
-
-		            
-		            for (String s : partes) {
-		            	ArrayList<String> resultado = tradutor.toPortugues(s);
-						System.out.println("Partes 0: " + partes[0]);
-						System.out.println("Partes LENGTH: " + partes.length);
-						System.out.println("Resultado: " + resultado);
-		            	if (!resultado.isEmpty()) {
-		            		if (resultado.size() >= 2){
-								sfBB = true;
-		            			for (int i = 0; i < resultado.size(); i++) {
-		            				if (i == 0) {
-										if (!sfB) {
-		            						sf = resultado.get(i);
-										} else {
-											sf = sf + "/" + resultado.get(i);
-										}
-		            				}
-		            				else {
-		            					sf = sf + "/" + resultado.get(i);
-										System.out.println("SF: " + sf);
-		            				}
-		            			}
-		            		} else {
-								if (!sfBB && !sfB) {
-									sf = resultado.get(0);
-									sfB = true;
-								} else {
-									sf = sf + "/" + resultado.get(0);
-									sfB = true;
-								}
-								System.out.println("S: " + s);
-								System.out.println("SF: " + sf);
-		            		}
-		            	}
-					}
-		            
-		            if (!sf.isEmpty()) {
-						if (sfB) {
-							ArrayList<String> usadas = new ArrayList<>();					
-							String [] pt2 = sf.split("/");
-							for (int i = 0; i < pt2.length; i++) {
-								if (!(i % 2 == 0)) {
-									if (usadas.contains(pt2[i-1])) {
-										continue;
-									}
-									usadas.add(pt2[i-1]);
-									tradução.add(pt2[i] + " ");
-									}
-								}
-						} 
-						if (tradução.size() == 1 || !sfB && sfBB){
-							String [] pt2 = sf.split("/");
-							int n = 0;
-							for (int i = 0; i < pt2.length; i++) {
-								if (!(i % 2 == 0)) {
-									n += 1;
-									tradução.add(pt2[i] + "\n");
-								}
-							}
-							tradução.add(0, "Resultados da pesquisa: " + n + "\n");
-							textArea.setText(String.join("", tradução));
-							} else {
-								tradução.add(0, "Tradução da frase: " + "\n");
-								textArea.setText(String.join("", tradução));
-							}
-		            } else {
-		            	textArea.setText("Palavra inválida");
-		            }
+					textArea.setText("Palavra inválida");
 				}
 			}
 		});
